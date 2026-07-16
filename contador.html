@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuenta Regresiva · Brenda 🎂</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ============================================================
+       BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: #0f0a1a;
+      color: #fff;
+      position: relative;
+    }
+
+    /* ============================================================
+       CANVAS PARTICLES (stars)
+    ============================================================ */
+    #particles {
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       AURORA GRADIENT BACKGROUND
+    ============================================================ */
+    .aurora {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 120% 70% at 20% 10%,  rgba(180,100,220,.30) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 60% at 80% 15%,  rgba(100,160,255,.20) 0%, transparent 55%),
+        radial-gradient(ellipse 110% 80% at 50% 90%,  rgba(240,130,170,.22) 0%, transparent 60%),
+        radial-gradient(ellipse 90%  70% at 10% 80%,  rgba(100,220,180,.15) 0%, transparent 55%);
+      animation: auroraShift 14s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes auroraShift {
+      0%   { opacity: .7; filter: hue-rotate(0deg); }
+      50%  { opacity: 1;  filter: hue-rotate(25deg); }
+      100% { opacity: .8; filter: hue-rotate(-18deg); }
+    }
+
+    /* ============================================================
+       FLOATING PETALS
+    ============================================================ */
+    .petals-wrap {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none; overflow: hidden;
+    }
+    .petal {
+      position: absolute; top: -60px;
+      font-size: 1.3rem; opacity: 0;
+      animation: petalFall linear infinite;
+    }
+    @keyframes petalFall {
+      0%   { transform: translateY(0)    rotate(0deg)   scale(1);   opacity: 0; }
+      8%   { opacity: .8; }
+      90%  { opacity: .5; }
+      100% { transform: translateY(110vh) rotate(720deg) scale(.6); opacity: 0; }
+    }
+
+    /* ============================================================
+       SCREENS
+    ============================================================ */
+    .screen {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px;
+      transition: opacity .9s ease, transform .9s ease;
+    }
+    .screen.hidden {
+      opacity: 0; pointer-events: none;
+      transform: scale(.97);
+    }
+
+    /* ============================================================
+       COUNTDOWN SCREEN
+    ============================================================ */
+    #countdown-screen { gap: 0; text-align: center; }
+
+    /* Top tag */
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50px;
+      padding: 8px 22px;
+      font-size: .78rem; letter-spacing: 2.5px; text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 30px;
+      backdrop-filter: blur(8px);
+    }
+    .tag-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #F090B5;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* Main heading */
+    .cd-pretitle {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      color: rgba(255,210,230,.75);
+      margin-bottom: 6px;
+    }
+    .cd-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #FAC8D8, #C8A8F0, #90C8FF, #F0B0C8);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradShift 6s ease-in-out infinite;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    @keyframes gradShift {
+      0%,100%{ background-position:0% 50%; }
+      50%    { background-position:100% 50%; }
+    }
+    .cd-subtitle {
+      font-size: clamp(.85rem, 2.5vw, 1.05rem);
+      color: rgba(255,255,255,.45);
+      letter-spacing: 1px;
+      margin-bottom: 54px;
+    }
+
+    /* ---- Countdown blocks ---- */
+    .blocks-wrap {
+      display: flex;
+      gap: clamp(10px, 3vw, 28px);
+      align-items: flex-start;
+      margin-bottom: 48px;
+    }
+
+    .block-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+    .block {
+      position: relative;
+      width: clamp(72px, 18vw, 130px);
+      height: clamp(80px, 20vw, 145px);
+      border-radius: clamp(14px, 2.5vw, 22px);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      /* glass */
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 8px 40px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    /* Glow accent per block */
+    .block-group:nth-child(1) .block { box-shadow: 0 8px 40px rgba(240,144,181,.25), inset 0 1px 0 rgba(255,255,255,.2); }
+    .block-group:nth-child(2) .block { box-shadow: 0 8px 40px rgba(192,168,240,.25), inset 0 1px 0 rgba(255,255,255,.2); }
+    .block-group:nth-child(3) .block { box-shadow: 0 8px 40px rgba(144,200,255,.25), inset 0 1px 0 rgba(255,255,255,.2); }
+    .block-group:nth-child(4) .block { box-shadow: 0 8px 40px rgba(150,220,190,.25), inset 0 1px 0 rgba(255,255,255,.2); }
+
+    /* Flip inner */
+    .block-inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; transform-style: preserve-3d;
+    }
+    .flip-anim { animation: flipNum .45s ease; }
+    @keyframes flipNum {
+      0%   { transform: rotateX(0deg);   opacity:1; }
+      45%  { transform: rotateX(-90deg); opacity:0; }
+      55%  { transform: rotateX(90deg);  opacity:0; }
+      100% { transform: rotateX(0deg);   opacity:1; }
+    }
+
+    .block-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6.5vw, 5.5rem);
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 20px rgba(255,255,255,.25);
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    /* Divider line inside block */
+    .block::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: rgba(255,255,255,.12);
+      pointer-events: none;
+    }
+
+    /* Colon separator */
+    .colon {
+      font-size: clamp(1.6rem, 5vw, 3.8rem);
+      color: rgba(255,255,255,.35);
+      margin-top: clamp(20px, 4vw, 38px);
+      font-family: 'Playfair Display', serif;
+      animation: blinkColon 1s step-start infinite;
+    }
+    @keyframes blinkColon { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .block-label {
+      font-size: clamp(.6rem, 1.8vw, .78rem);
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: rgba(255,255,255,.4);
+      font-weight: 700;
+    }
+    .block-group:nth-child(1) .block-label { color: rgba(240,144,181,.7); }
+    .block-group:nth-child(2) .block-label { color: rgba(192,168,240,.7); }
+    .block-group:nth-child(3) .block-label { color: rgba(144,200,255,.7); }
+    .block-group:nth-child(4) .block-label { color: rgba(150,220,190,.7); }
+
+    /* Bottom date chip */
+    .date-chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50px;
+      padding: 11px 28px;
+      font-size: clamp(.78rem, 2vw, .9rem);
+      color: rgba(255,255,255,.6);
+      letter-spacing: 1px;
+      backdrop-filter: blur(8px);
+    }
+    .date-chip span { color: rgba(240,180,210,.9); font-weight: 700; }
+
+    /* ============================================================
+       REVEAL SCREEN
+    ============================================================ */
+    #reveal-screen { gap: 0; text-align: center; }
+    #reveal-screen.hidden { transform: scale(1.03); }
+
+    .rev-tag {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1rem, 3.5vw, 1.45rem);
+      color: rgba(255,210,230,.8);
+      margin-bottom: 28px;
+      animation: fadeUp .8s ease;
+    }
+
+    /* Photo frame */
+    .photo-frame {
+      position: relative;
+      width: clamp(200px, 55vw, 310px);
+      margin-bottom: 32px;
+      animation: frameReveal .9s cubic-bezier(.34,1.56,.64,1) .2s both;
+    }
+    @keyframes frameReveal {
+      from { opacity:0; transform:scale(.7) rotate(-6deg); }
+      to   { opacity:1; transform:scale(1)  rotate(-1.8deg); }
+    }
+
+    /* Outer glow ring */
+    .photo-frame::before {
+      content: '';
+      position: absolute; inset: -8px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #F090B5, #B888DC, #90C8FF, #96C9A4, #F090B5);
+      background-size: 300% 300%;
+      animation: gradShift 4s ease-in-out infinite;
+      z-index: -1;
+      filter: blur(3px) opacity(.8);
+    }
+
+    /* Polaroid card */
+    .photo-inner {
+      background: white;
+      border-radius: 20px;
+      padding: 14px 14px 52px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+    }
+
+    .photo-inner img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      background: linear-gradient(135deg, #F5D5E5, #E5D0F5);
+    }
+
+    /* Placeholder overlay (remove when you add real photo) */
+    .photo-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #F5D5E5 0%, #E0D0F5 50%, #D0E8F5 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      color: rgba(120,80,140,.5);
+    }
+    .photo-placeholder .ph-icon { font-size: 3rem; opacity: .6; }
+    .photo-placeholder .ph-text { font-family:'Dancing Script',cursive; font-size:.95rem; }
+
+    /* Washi tape on photo */
+    .washi {
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%) rotate(-4deg);
+      width: 70px; height: 22px;
+      border-radius: 4px;
+      background: rgba(248,195,210,.65);
+      z-index: 5;
+    }
+
+    /* Name on polaroid bottom */
+    .photo-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.15rem;
+      color: #9A7890;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* Birthday text */
+    .rev-hb {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #FAC8D8, #C8A8F0, #90C8FF);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradShift 5s ease-in-out infinite, fadeUp .7s ease .4s both;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .rev-sub {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(.95rem, 3vw, 1.3rem);
+      color: rgba(255,210,230,.7);
+      margin-bottom: 34px;
+      animation: fadeUp .7s ease .55s both;
+    }
+
+    /* Continue button */
+    .cont-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      text-decoration: none;
+      background: linear-gradient(135deg, #F090B5, #B888DC);
+      color: white;
+      border: none; border-radius: 50px;
+      padding: clamp(14px,3vw,18px) clamp(32px,6vw,54px);
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 34px rgba(184,136,220,.5);
+      transition: transform .3s ease, box-shadow .3s ease;
+      animation: fadeUp .7s ease .75s both;
+    }
+    .cont-btn:hover  { transform: translateY(-5px) scale(1.04); box-shadow: 0 16px 48px rgba(184,136,220,.65); }
+    .cont-btn:active { transform: translateY(-1px) scale(.97); }
+    .cont-arr { font-size: 1.3rem; transition: transform .3s ease; }
+    .cont-btn:hover .cont-arr { transform: translateX(5px); }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ============================================================
+       RESPONSIVE TWEAKS
+    ============================================================ */
+    @media (max-width: 480px) {
+      .blocks-wrap { gap: 8px; }
+      .colon { margin-top: 22px; }
+    }
+    @media (max-height: 640px) {
+      .cd-title  { margin-bottom: 4px; }
+      .cd-subtitle { margin-bottom: 28px; }
+      .blocks-wrap { margin-bottom: 24px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Aurora background -->
+  <div class="aurora"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="particles"></canvas>
+
+  <!-- Floating petals -->
+  <div class="petals-wrap" id="petalsWrap"></div>
+
+  <!-- ============================================================
+       SCREEN 1 — COUNTDOWN
+  ============================================================ -->
+  <div class="screen" id="countdown-screen">
+
+    <div class="tag-pill">
+      <div class="tag-dot"></div>
+      Contando cada segundo
+    </div>
+
+    <p class="cd-pretitle">✨ Algo muy especial se acerca para ti…</p>
+    <h1 class="cd-title">Kari</h1>
+    <p class="cd-subtitle">18 de Julio al medio día · espera tu regalo digital</p>
+
+    <div class="blocks-wrap">
+      <div class="block-group">
+        <div class="block"><div class="block-inner"><span class="block-num" id="cd-d">00</span></div></div>
+        <span class="block-label">Días</span>
+      </div>
+      <div class="colon">:</div>
+      <div class="block-group">
+        <div class="block"><div class="block-inner"><span class="block-num" id="cd-h">00</span></div></div>
+        <span class="block-label">Horas</span>
+      </div>
+      <div class="colon">:</div>
+      <div class="block-group">
+        <div class="block"><div class="block-inner"><span class="block-num" id="cd-m">00</span></div></div>
+        <span class="block-label">Minutos</span>
+      </div>
+      <div class="colon">:</div>
+      <div class="block-group">
+        <div class="block"><div class="block-inner"><span class="block-num" id="cd-s">00</span></div></div>
+        <span class="block-label">Segundos</span>
+      </div>
+    </div>
+
+    <div class="date-chip">
+      🎂 Cumpleaños &nbsp;<span>18 · Julio · 2026</span>
+    </div>
+    <!-- <button id="btnReveal" class="cont-btn">
+      Ver otra vez
+      <span class="cont-arr">→</span>
+    </button> -->
+    <!-- <button id="btnReveal" class="cont-btn">
+   Ver otra vez
+   <span class="cont-arr">→</span>
+</button> -->
+  </div>
+
+  <!-- ============================================================
+       SCREEN 2 — REVEAL
+  ============================================================ -->
+  <div class="screen hidden" id="reveal-screen">
+
+    <p class="rev-tag">🌸 ¡El momento tan esperado ha llegado!</p>
+
+    <div class="photo-frame">
+      <div class="washi"></div>
+      <div class="photo-inner">
+       
+        <!-- <img src="brenda.JPG" alt="Tu foto kari"> -->
+        <img src="kari2.JPG" alt="Tu foto kari">
+        <p class="photo-name">Brenda 🌸💕</p>
+      </div>
+    </div>
+    <!-- ◄ FIN del bloque a reemplazar -->
+
+    <h2 class="rev-hb">¡Feliz Cumpleaños,<br><em>Brenda!</em></h2>
+    <p class="rev-sub">Hoy el universo celebra que existes ✨</p>
+
+    <a  href="feliz.html" class="cont-btn">
+      Tu regalo te espera
+      <span class="cont-arr">→</span>
+    </a>
+
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    /* --------------------------------------------------------
+       1. PARTICLE CANVAS — mini stars
+    -------------------------------------------------------- */
+    const canvas = document.getElementById('particles');
+    const ctx    = canvas.getContext('2d');
+    let W, H, stars = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function initStars() {
+      stars = Array.from({ length: 130 }, () => ({
+        x:   Math.random() * W,
+        y:   Math.random() * H,
+        r:   Math.random() * 1.4 + .3,
+        a:   Math.random(),
+        da:  (Math.random() * .007 + .003) * (Math.random() < .5 ? 1 : -1),
+        spd: Math.random() * .08 + .02,
+      }));
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, W, H);
+      stars.forEach(s => {
+        s.a  = Math.max(.05, Math.min(1, s.a + s.da));
+        if (s.a <= .05 || s.a >= 1) s.da *= -1;
+        s.y  = (s.y - s.spd + H) % H;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    resize(); initStars(); drawStars();
+
+
+    /* --------------------------------------------------------
+       2. FLOATING PETALS
+    -------------------------------------------------------- */
+    const petalChars = ['🌸','✨','⭐','🌷','💫','🎀','🌺','💕'];
+    const wrap = document.getElementById('petalsWrap');
+
+    function spawnPetal() {
+      const p = document.createElement('span');
+      p.className = 'petal';
+      p.textContent = petalChars[Math.floor(Math.random() * petalChars.length)];
+      const size  = Math.random() * .8 + .8;
+      const dur   = Math.random() * 12 + 10;
+      const delay = Math.random() * 6;
+      p.style.cssText = `
+        left: ${Math.random()*100}%;
+        font-size: ${size}rem;
+        animation-duration: ${dur}s;
+        animation-delay: ${delay}s;
+      `;
+      wrap.appendChild(p);
+      setTimeout(() => p.remove(), (dur + delay) * 1000 + 500);
+    }
+
+    for (let i = 0; i < 18; i++) spawnPetal();
+    setInterval(spawnPetal, 2200);
+
+
+    /* --------------------------------------------------------
+       3. COUNTDOWN LOGIC
+    -------------------------------------------------------- */
+    const TARGET = new Date('2026-07-18T12:00:00');
+    // const TARGET = new Date('2026-07-15T20:04:00');
+
+    const elD = document.getElementById('cd-d');
+    const elH = document.getElementById('cd-h');
+    const elM = document.getElementById('cd-m');
+    const elS = document.getElementById('cd-s');
+
+    let prevD = -1, prevH = -1, prevM = -1, prevS = -1;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function flip(el, val, prev) {
+      if (val === prev) return;
+      el.textContent = pad(val);
+      el.classList.remove('flip-anim');
+      void el.offsetWidth; // reflow
+      el.classList.add('flip-anim');
+    }
+
+    function tick() {
+      const now  = new Date();
+      const diff = TARGET - now;
+
+      if (diff <= 0) {
+        showReveal();
+        return;
+      }
+
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000)  / 60000);
+      const s = Math.floor((diff % 60000)    / 1000);
+
+      flip(elD, d, prevD); prevD = d;
+      flip(elH, h, prevH); prevH = h;
+      flip(elM, m, prevM); prevM = m;
+      flip(elS, s, prevS); prevS = s;
+    }
+    
+
+    tick();
+    const timer = setInterval(tick, 1000);
+
+
+    /* --------------------------------------------------------
+       4. REVEAL SEQUENCE
+    -------------------------------------------------------- */
+
+
+    let revealed = false;
+
+    function showReveal() {
+      console.log('inicio')
+      if (revealed)return;
+      revealed = true;
+      clearInterval(timer);
+
+      const cdScreen  = document.getElementById('countdown-screen');
+      const revScreen = document.getElementById('reveal-screen');
+
+      /* Fade out countdown */
+      cdScreen.style.opacity  = '0';
+      cdScreen.style.transform = 'scale(.97)';
+      cdScreen.style.transition = 'opacity .8s ease, transform .8s ease';
+
+      setTimeout(() => {
+        cdScreen.classList.add('hidden');
+        revScreen.classList.remove('hidden');
+
+        /* Confetti burst */
+        const colors = ['#F9C6D0','#C8EAD3','#E5D5F5','#FFF3C0','#F4B8C4','#C0A0E0','#96C9A4','#90C8FF'];
+        const rnd = (a, b) => Math.random() * (b - a) + a;
+
+        confetti({ particleCount:200, startVelocity:60, spread:360,
+                   ticks:120, zIndex:9999, colors, origin:{x:.5, y:.55} });
+
+        const end = Date.now() + 3500;
+        const iv  = setInterval(() => {
+          if (Date.now() > end) return clearInterval(iv);
+          const pc = 40;
+          confetti({ particleCount:pc, startVelocity:35, spread:360,
+                     ticks:80, zIndex:9999, colors, origin:{x:rnd(.05,.3), y:rnd(-.1,.2)} });
+          confetti({ particleCount:pc, startVelocity:35, spread:360,
+                     ticks:80, zIndex:9999, colors, origin:{x:rnd(.7,.95), y:rnd(-.1,.2)} });
+        }, 300);
+
+      }, 850);
+    }
+    // DEV SHORTCUT: quita el comentario para saltar al reveal
+    // setTimeout(showReveal, 1200);
+    
+  </script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"f0f03d0605bf45f1a3b17cf7d5e6861f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
