@@ -34,7 +34,33 @@ body {
 }
 
 /* son raul */
+.audio-player{
+    display: none;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
 
+    padding: 8px;
+    border-radius: 15px;
+    background: rgba(255,255,255,.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,.2);
+    opacity: .2;
+    transition: opacity .3s;
+    z-index: 9999;
+}
+
+.audio-player:hover{
+    opacity: 1;
+}
+
+#audio{
+    width: 100px;
+    opacity: 0.4;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
 
 /* ============================================================
        AURORA GRADIENT BACKGROUND
