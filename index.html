@@ -14,8 +14,19 @@
 </head>
 
 <body>
+
+  <div class="wrapper">
+    <button class="play-btn" id="playBtn" onclick="toggleAudio()">
+      <div class="play-icon" id="playIcon"></div>
+      <div class="pause-icon" id="pauseIcon">
+        <span></span><span></span>
+      </div>
+    </button>
+    <!-- <p class="label" id="label">Reproducir música 🎵</p> -->
+  </div>
+
   <div class="audio-player">
-    <audio id="musica" autoplay loop controls muted>
+    <audio id="musica"  loop>
       <source src="media/raul.mp3" type="audio/mpeg">
     </audio>
   </div>

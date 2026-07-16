@@ -168,14 +168,29 @@
 
 
 
-  window.addEventListener('load', () => {
-    const audio = document.getElementById('musica');
-    audio.muted = false; // Intentar desmutear después de cargar
-    audio.play().catch(() => {
-      // Si falla, el usuario tendrá que presionar play manualmente
-      console.log('Autoplay bloqueado por el navegador');
-    });
-  });
+ const audio = document.getElementById('musica');
+    const btn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const label = document.getElementById('label');
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+        // Cambiar a ícono pause
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'flex';
+        btn.classList.add('playing');
+        label.textContent = 'Pausar música 🎵';
+      } else {
+        audio.pause();
+        // Cambiar a ícono play
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        btn.classList.remove('playing');
+        label.textContent = 'Reproducir música 🎵';
+      }
+    }
 
     
 //   </script>

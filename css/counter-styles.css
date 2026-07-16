@@ -36,6 +36,9 @@ body {
 /* son raul */
 .audio-player{
     display: none;
+}
+/* .audio-player{
+    display: none;
     position: fixed;
     bottom: 15px;
     right: 15px;
@@ -49,18 +52,95 @@ body {
     opacity: .2;
     transition: opacity .3s;
     z-index: 9999;
-}
+} */
 
-.audio-player:hover{
+/* .audio-player:hover{
     opacity: 1;
 }
 
 #audio{
     width: 100px;
-    /* opacity: 0.4;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px); */
-}
+ 
+} */
+
+/* boton para audio */
+.play-btn {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #e91e8c, #b50cbb);
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(233, 30, 140, 0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 40px rgba(233, 30, 140, 0.8);
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Ícono play (triángulo) */
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-top: 16px solid transparent;
+      border-bottom: 16px solid transparent;
+      border-left: 26px solid white;
+      margin-left: 6px;
+      transition: opacity 0.2s;
+    }
+
+    /* Ícono pause (dos barras) */
+    .pause-icon {
+      display: none;
+      gap: 6px;
+    }
+
+    .pause-icon span {
+      display: block;
+      width: 8px;
+      height: 26px;
+      background: white;
+      border-radius: 3px;
+    }
+
+    /* Animación de pulso cuando está reproduciendo */
+    .play-btn.playing {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 25px rgba(233, 30, 140, 0.5); }
+      50%  { box-shadow: 0 0 50px rgba(233, 30, 140, 0.9); }
+      100% { box-shadow: 0 0 25px rgba(233, 30, 140, 0.5); }
+    }
+
+    .label {
+      margin-top: 16px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .wrapper {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
 /* ============================================================
        AURORA GRADIENT BACKGROUND
