@@ -32,6 +32,15 @@
 .btnRegresar:hover{
   color: #e91e8c;
 }
+.polar{
+  width: 150px;
+  height: 150px;
+}
+.contenedor-polar{
+  background-color: white;
+  border-radius: 100%;
+  width: 150px;
+}
 
 
 /* ------------------------ */
@@ -773,7 +782,12 @@
     }
     .dedication.show { opacity:1; transform:translateY(0); visibility:visible; }
 
-    .ded-emoji { font-size:3.2rem; margin-bottom:16px; }
+    .ded-emoji { 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size:3.2rem; margin-bottom:16px; 
+    }
     .ded-title {
       font-family:'Playfair Display',serif;
       font-size:clamp(1.5rem,4vw,2rem); color:#fff;
