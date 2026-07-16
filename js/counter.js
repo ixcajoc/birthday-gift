@@ -165,5 +165,17 @@
     // DEV SHORTCUT: quita el comentario para saltar al reveal
     // setTimeout(showReveal, 1200);
     // setTimeout(showReveal, 2000);
+
+
+
+  window.addEventListener('load', () => {
+    const audio = document.getElementById('musica');
+    audio.muted = false; // Intentar desmutear después de cargar
+    audio.play().catch(() => {
+      // Si falla, el usuario tendrá que presionar play manualmente
+      console.log('Autoplay bloqueado por el navegador');
+    });
+  });
+
     
 //   </script>

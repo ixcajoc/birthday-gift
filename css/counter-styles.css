@@ -57,9 +57,9 @@ body {
 
 #audio{
     width: 100px;
-    opacity: 0.4;
+    /* opacity: 0.4;
     backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px); */
 }
 
 /* ============================================================
