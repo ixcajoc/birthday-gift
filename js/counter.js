@@ -164,7 +164,7 @@
     }
     // DEV SHORTCUT: quita el comentario para saltar al reveal
     // setTimeout(showReveal, 1200);
-    // setTimeout(showReveal, 2000);
+    setTimeout(showReveal, 2000);
 
 
 
