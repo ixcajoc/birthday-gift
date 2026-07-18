@@ -127,9 +127,9 @@
 
     function showReveal() {
       console.log('inicio')
-      if (revealed)return;
-      revealed = true;
-      clearInterval(timer);
+      // if (revealed)return;
+      // revealed = true;
+      // clearInterval(timer);
 
       const cdScreen  = document.getElementById('countdown-screen');
       const revScreen = document.getElementById('reveal-screen');
@@ -158,13 +158,13 @@
                      ticks:80, zIndex:9999, colors, origin:{x:rnd(.05,.3), y:rnd(-.1,.2)} });
           confetti({ particleCount:pc, startVelocity:35, spread:360,
                      ticks:80, zIndex:9999, colors, origin:{x:rnd(.7,.95), y:rnd(-.1,.2)} });
-        }, 300);
+        }, 2000);
 
-      }, 850);
+      }, 1500);
     }
     // DEV SHORTCUT: quita el comentario para saltar al reveal
     // setTimeout(showReveal, 1200);
-    setTimeout(showReveal, 2000);
+    // setTimeout(showReveal, 2000);
 
 
 
